@@ -146,7 +146,7 @@
             <Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">You are an Admin so your password must be at least 20 characters long</Item>
           </Metadata>
           <ValidationTechnicalProfiles>
-            <ValidationTechnicalProfile ReferenceId="Verify-PasswordLengthForAdmins">
+            <ValidationTechnicalProfile ReferenceId="Verify-PasswordLengthForAdmins" ContinueOnError="false">
               <Preconditions>
                 <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
                   <Value>extension_isAdmin</Value>
