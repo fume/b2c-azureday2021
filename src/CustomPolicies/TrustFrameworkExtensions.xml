@@ -12,7 +12,43 @@
         <DataType>boolean</DataType>
         <AdminHelpText>Whether the user has selected Forgot your Password</AdminHelpText>
       </ClaimType>
+      <ClaimType Id="extension_isAdmin">
+        <DisplayName>Is Admin</DisplayName>
+        <DataType>boolean</DataType>
+      </ClaimType>
+      <ClaimType Id="lengthIsGreaterThan20">
+        <DisplayName>Length Greater than 20 chars</DisplayName>
+        <DataType>boolean</DataType>
+      </ClaimType>
+      <ClaimType Id="validationResult">
+        <DataType>string</DataType>
+        <UserHelpText>Add help text here</UserHelpText>
+      </ClaimType>
+
     </ClaimsSchema>
+    <ClaimsTransformations>
+      <ClaimsTransformation Id="CheckPasswordLengthGreaterThan20" TransformationMethod="SetClaimsIfRegexMatch">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="newPassword" TransformationClaimType="claimToMatch" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="matchTo" DataType="string" Value="^.{20,}$" />
+          <InputParameter Id="outputClaimIfMatched" DataType="string" Value="true" />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="validationResult" TransformationClaimType="outputClaim" />
+          <OutputClaim ClaimTypeReferenceId="lengthIsGreaterThan20" TransformationClaimType="regexCompareResultClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+      <ClaimsTransformation Id="AssertPasswordLengthGreaterThan20" TransformationMethod="AssertBooleanClaimIsEqualToValue">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="lengthIsGreaterThan20" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="valueToCompareTo" DataType="boolean" Value="true" />
+        </InputParameters>
+      </ClaimsTransformation>
+    </ClaimsTransformations>
     <ContentDefinitions>
       <ContentDefinition Id="api.error">
         <DataUri>urn:com:microsoft:aad:b2c:elements:contract:globalexception:1.2.1</DataUri>
@@ -47,6 +83,7 @@
         </Metadata>
       </ContentDefinition>
     </ContentDefinitions>
+
   </BuildingBlocks>
 
   <ClaimsProviders>
@@ -77,6 +114,38 @@
             <Item Key="setting.forgotPasswordLinkOverride">ForgotPasswordExchange</Item>
           </Metadata>
         </TechnicalProfile>
+        <TechnicalProfile Id="Verify-PasswordLengthForAdmins">
+          <DisplayName>Verify admin password length</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="newPassword" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="lengthIsGreaterThan20" DefaultValue="false" />
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="CheckPasswordLengthGreaterThan20" />
+            <OutputClaimsTransformation ReferenceId="AssertPasswordLengthGreaterThan20" />
+          </OutputClaimsTransformations>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+        <TechnicalProfile Id="LocalAccountWritePasswordUsingObjectId">
+          <Metadata>
+            <Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">You are an Admin so your password must be at least 20 characters long</Item>
+          </Metadata>
+          <ValidationTechnicalProfiles>
+            <ValidationTechnicalProfile ReferenceId="Verify-PasswordLengthForAdmins">
+              <Preconditions>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+                  <Value>extension_isAdmin</Value>
+                  <Value>False</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>
+            <ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordUsingObjectId"/>
+          </ValidationTechnicalProfiles>
+        </TechnicalProfile>
       </TechnicalProfiles>
     </ClaimsProvider>
     <ClaimsProvider>
@@ -89,6 +158,21 @@
             <!--Insert b2c-extensions-app application ObjectId here, for example: 22222222-2222-2222-2222-222222222222-->
             <Item Key="ApplicationObjectId">{Settings:ExtensionsObjectId}</Item>
           </Metadata>
+        </TechnicalProfile>
+        <TechnicalProfile Id="AAD-UserReadUsingEmailAddress">
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="extension_isAdmin" DefaultValue="false" />
+          </OutputClaims>
+        </TechnicalProfile>
+        <TechnicalProfile Id="LocalAccountDiscoveryUsingEmailAddress">
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="extension_isAdmin" />
+          </OutputClaims>
+        </TechnicalProfile>
+        <TechnicalProfile Id="AAD-UserWritePasswordUsingObjectId">
+          <PersistedClaims>
+            <PersistedClaim ClaimTypeReferenceId="passwordPolicies" DefaultValue="DisablePasswordExpiration, DisableStrongPassword" AlwaysUseDefaultValue="true" />
+          </PersistedClaims>
         </TechnicalProfile>
       </TechnicalProfiles>
     </ClaimsProvider>
