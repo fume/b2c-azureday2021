@@ -61,18 +61,30 @@
       </ContentDefinition>
       <ContentDefinition Id="api.signuporsignin">
         <DataUri>urn:com:microsoft:aad:b2c:elements:contract:unifiedssp:2.1.5</DataUri>
+        <Metadata>
+          <Item Key="setting.pageFlavor">classic</Item>
+        </Metadata>
       </ContentDefinition>
       <ContentDefinition Id="api.selfasserted">
         <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.6</DataUri>
+        <Metadata>
+          <Item Key="setting.pageFlavor">classic</Item>
+        </Metadata>
       </ContentDefinition>
       <ContentDefinition Id="api.selfasserted.profileupdate">
         <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.6</DataUri>
       </ContentDefinition>
       <ContentDefinition Id="api.localaccountsignup">
         <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.6</DataUri>
+        <Metadata>
+          <Item Key="setting.pageFlavor">classic</Item>
+        </Metadata>
       </ContentDefinition>
       <ContentDefinition Id="api.localaccountpasswordreset">
         <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.6</DataUri>
+        <Metadata>
+          <Item Key="setting.pageFlavor">classic</Item>
+        </Metadata>
       </ContentDefinition>
       <ContentDefinition Id="api.phonefactor">
         <LoadUri>~/tenant/templates/AzureBlue/multifactor-1.0.0.cshtml</LoadUri>
@@ -143,7 +155,7 @@
                 </Precondition>
               </Preconditions>
             </ValidationTechnicalProfile>
-            <ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordUsingObjectId"/>
+            <ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordUsingObjectId" />
           </ValidationTechnicalProfiles>
         </TechnicalProfile>
       </TechnicalProfiles>
