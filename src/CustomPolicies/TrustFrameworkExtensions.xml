@@ -200,7 +200,15 @@
                 </Precondition>
               </Preconditions>
             </ValidationTechnicalProfile>
-            <ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordUsingObjectId" />
+            <ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordUsingObjectId">
+              <Preconditions>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+                  <Value>lengthIsGreaterThan20</Value>
+                  <Value>False</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>
           </ValidationTechnicalProfiles>
         </TechnicalProfile>
         <TechnicalProfile Id="Get-MigrationRequired">
