@@ -730,9 +730,6 @@
             <OutputClaim ClaimTypeReferenceId="objectId" />
             <OutputClaim ClaimTypeReferenceId="authenticationSource" />
           </OutputClaims>
-          <ValidationTechnicalProfiles>
-            <ValidationTechnicalProfile ReferenceId="login-NonInteractive" />
-          </ValidationTechnicalProfiles>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
 
